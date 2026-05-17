@@ -49,16 +49,26 @@
 public class Card {
 
 	/*** CONSTANT VARIABLES ***/
+	public static final char HEART = '♥';
+	public static final char DIAMOND = '♦';
+	public static final char CLUB = '♣';
+	public static final char SPADE = '♠';
 
+	public static final int DEFAULT_VALUE = 1;
+	public static final char DEFAULT_SUIT = Card.HEART;
 
 	/*** INSTANCE VARIABLES ***/
-
+	private int value;
+	private char suit;
 
 	/*** CONSTRUCTOR METHODS ***/
 	/**
 	 * Default constructor, builds default card object as: A ♥
 	 */
 
+	public Card(){
+		this(DEFAULT_VALUE, DEFAULT_SUIT);
+	}
 
 	/**
 	 * Full constructor builds object with all data for instance variables provided.
@@ -71,6 +81,13 @@ public class Card {
 	 */
 
 
+	public Card(int value, char suit) {
+		if (!this.setAll(value, suit)) {
+			System.out.println("ERORR: bad data given to full constructor. Shutting down...");
+			System.exit(0);
+		}
+	}
+
 	/**
 	 * Copy constructor builds object with all data from Card object provided. No
 	 * changes made to original object, no shallow copying
@@ -78,6 +95,14 @@ public class Card {
 	 * @param original Card object to be copied
 	 */
 
+	public Card(Card original) {
+		if (original != null) {
+			this.setAll(original.value, original.suit);
+		} else {
+			System.out.println("ERORR: copy constructor given NULL. Shutting down...");
+			System.exit(0);
+		}
+	}
 
 	/*** MUTATOR METHODS (SETTERS) ***/
 	/**
@@ -90,6 +115,14 @@ public class Card {
 	 *
 	 * @return true if card value is between 1 and 13 (inclusive), false otherwise
 	 */
+
+	public boolean setValue(int value) {
+		boolean isValid = value >= 1 && value <= 13;
+		if (isValid) {
+			this.value = value;
+		}
+		return isValid;
+	}
 
 
 	/**
@@ -104,6 +137,16 @@ public class Card {
 	 *         false otherwise
 	 */
 
+	public boolean setSuit(char suit) {
+		boolean isValid;
+		isValid = suit == Card.HEART || suit == Card.DIAMOND || suit == Card.CLUB || suit == Card.SPADE;
+
+		if(isValid){
+			this.suit = suit;
+		}
+		return isValid;
+	}
+
 
 	/**
 	 * Sets suit and value for card only if valid, returns boolean representing
@@ -117,7 +160,16 @@ public class Card {
 	 * @return true if card suit AND value are valid, false otherwise
 	 */
 
+	public boolean setAll(int value, char suit) {
+		if (!this.setValue(value)) {
+			return false;
+		} else if (!this.setSuit(suit)) {
+			return false;
+		} else {
+			return true;
+		}
 
+	}
 	/*** ACCESSOR METHODS (GETTERS) ***/
 	/**
 	 * Access unicode character representing suit of card
@@ -125,14 +177,20 @@ public class Card {
 	 * @return suit as unicode character for heart, spade, diamond, or club
 	 */
 
-
+	public char getSuit() {
+		return this.suit;
+	}
+	
 	/**
 	 * Access numerical value of card (1-13)
 	 *
 	 * @return value as raw integer 1-13 (not what player sees as A, 2-10, J, Q, K;
 	 *         see {@link #getPrintValue()})
 	 */
-
+	
+	public int getValue() {
+		return this.value;
+	}
 
 	/**
 	 * Access value of card as seen by user (A, 2-10, J, Q, K) that would be printed
@@ -142,15 +200,44 @@ public class Card {
 	 *         value 1-13 (see {@link #getValue()})
 	 */
 
-
+	public String getPrintValue() {
+		switch (this.value) {
+			case 1:
+				return "A";
+			case 11:
+				return "J";
+			case 12:
+				return "Q";
+			case 13:
+				return "K";
+			default:
+				return "" + this.value;
+		}
+	}
+	
 	/**
 	 * Access ASCII art version of card data, each line separated by newline
 	 * character, no newline character at end of String
 	 *
 	 * @return String containing ASCII art with card suit and card print value
 	 */
+	
+	public String getPrintCard() {
+		String printCard = "-------\n";
+		printCard += "|" + this.suit + "   " + this.suit + "|\n";//top suit row
 
+		//handle middle row
+		if (this.value == 10) {
+			printCard += "| ";
+		} else {
+			printCard += "|   ";
+		}
+		printCard += this.getPrintValue() + "  |\n";  
 
+		printCard += "|" + this.suit +"   " + this.suit + "|\n";//bottom suit row
+		printCard += "-------\n";//bottom border
+		return printCard;
+	}
 	/*** OTHER REQUIRED METHODS ***/
 	/**
 	 * String of all instance variables, no newline character at end of String.
@@ -158,7 +245,10 @@ public class Card {
 	 * 
 	 * @return String containing (print) value and suit, separated by a space
 	 */
-
+	public String toString() 
+	{
+		return this.getPrintValue() + " " + this.suit;
+	}
 
 	/**
 	 * Checking for equality of Card objects, all instance variables exactly equal
@@ -169,13 +259,19 @@ public class Card {
 	 * @return boolean representing equality between both objects, all data is
 	 *         exactly equal to each other
 	 */
-
+	public boolean equals(Card otherCard) {
+		if (otherCard == null) {
+			return false;
+		} else {
+			return this.value == otherCard.value && this.suit == otherCard.suit;
+		}
+	}
 
 	/*** EXTRA METHODS ***/
 	/**
 	 * Prints card ASCII art to console (see {@link #getPrintCard()})
 	 */
-
-
-
+	public void printCard() {
+		System.out.println(this.getPrintCard());
+	}
 }
